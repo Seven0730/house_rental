@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 配置Mabatis映射文件 -->
+<mapper namespace="com.superCode.dao.BannerDAO">
+    <resultMap type="com.superCode.entity.Banner" id="bannerMap">
+        <id property="bannerid" column="bannerid"/>
+        <result property="bannername" column="bannername"/>
+    </resultMap>
+    <!-- 插入语句 DAO通过id调用此配置 -->
+    <insert id="insert" parameterType="banner">
+		insert into
+		banner(  bannername )
+		 values(		#{bannername} )
+	</insert>
+    <!-- 更新语句 DAO通过id调用此配置 -->
+    <update id="update" parameterType="banner">
+		update banner set
+		bannername=#{bannername} where bannerid=#{bannerid}
+	</update>
+    <!-- 按主键删除 DAO通过id调用此配置 -->
+    <delete id="delete" parameterType="String">
+		delete from banner where
+		bannerid = #{bannerid}
+	</delete>
+    <!-- 查询全部信息 DAO通过id调用此配置 -->
+    <select id="getAll" parameterType="map" resultMap="bannerMap">
+        select * from banner
+        where 1=1
+        <if test="keyword != null and keyword != ''">
+            and
+            (
+            bannername like CONCAT('%',#{keyword},'%')
+
+            )
+        </if>
+
+        <if test="(start != null and start != '') or start==0 ">
+            <if test=" limit != null and limit != ''">
+                limit #{start},#{limit}
+            </if>
+        </if>
+
+    </select>
+
+
+    <!-- 统计 获取 总数    用于分页-->
+
+    <select id="getRowSize" parameterType="map" resultType="int">
+        select count(1) from banner
+        where 1=1
+        <if test="keyword != null and keyword != ''">
+            and
+            (
+            bannername like CONCAT('%',#{keyword},'%')
+
+            )
+        </if>
+
+
+    </select>
+    <!-- 按主键查询 DAO通过id调用此配置 -->
+    <select id="getById" parameterType="String" resultMap="bannerMap">
+		select a.* from banner a where bannerid=#{bannerid} order by bannerid
+		desc
+	</select>
+    <!-- 按条件精确查询 DAO通过id调用此配置 -->
+    <select id="getByCond" parameterType="banner" resultMap="bannerMap">
+        select a.* from banner a where 1=1
+        <if test="bannername != null and '' != bannername">
+            and a.bannername = #{bannername}
+        </if>
+    </select>
+    <!-- 按条件模糊查询 DAO通过id调用此配置 -->
+    <select id="getByLike" parameterType="banner" resultMap="bannerMap">
+        select a.* from banner a where 1=1
+        <if test="bannername != null and '' != bannername">
+            and a.bannername like CONCAT('%', CONCAT(#{bannername},
+            '%'))
+        </if>
+    </select>
+</mapper>
+
+

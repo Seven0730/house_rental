@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 配置Mabatis映射文件 -->
+<mapper namespace="com.superCode.dao.Contract_infoDAO">
+    <resultMap type="com.superCode.entity.Contract_info" id="contract_infoMap">
+        <id property="contract_infoid" column="contract_infoid"/>
+        <result property="usersid" column="usersid"/>
+        <result property="housing_infoid" column="housing_infoid"/>
+        <result property="addtime" column="addtime"/>
+        <result property="number" column="number"/>
+        <result property="contract_info_files" column="contract_info_files"/>
+        <result property="memo" column="memo"/>
+        <result property="username" column="username"/>
+        <result property="realname" column="realname"/>
+    </resultMap>
+    <!-- 插入语句 DAO通过id调用此配置 -->
+    <insert id="insert" parameterType="contract_info">
+		insert into
+		contract_info( usersid , housing_infoid , addtime , contract_info_files , memo,number )
+		values(  #{usersid} , #{housing_infoid} , #{addtime} , #{contract_info_files}
+		, #{memo}, #{number} )
+	</insert>
+    <!-- 更新语句 DAO通过id调用此配置 -->
+    <update id="update" parameterType="contract_info">
+		update contract_info set
+		usersid=#{usersid} , housing_infoid=#{housing_infoid} ,
+		addtime=#{addtime} ,
+		contract_info_files=#{contract_info_files} , memo=#{memo} , number=#{number} where
+		contract_infoid=#{contract_infoid}
+	</update>
+    <!-- 按主键删除 DAO通过id调用此配置 -->
+    <delete id="delete" parameterType="String">
+		delete from contract_info where
+		contract_infoid = #{contract_infoid}
+	</delete>
+    <!-- 查询全部信息 DAO通过id调用此配置 -->
+    <select id="getAll" parameterType="map" resultMap="contract_infoMap">
+        select contract_info.* , users.username as username, housing_info.housing_infoname as housing_infoname,
+        users.realname from
+        contract_info
+        left join users on users .usersid=contract_info.usersid
+        left join housing_info on contract_info.housing_infoid = housing_info.housing_infoid
+
+        where 1=1
+
+
+        <if test="housing_infoid_list != null and housing_infoid_list.size > 0">
+            and contract_info.housing_infoid in
+            <foreach item="item" collection="housing_infoid_list" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+
+        </if>
+
+
+        <if test="housing_infoid != null and housing_infoid != ''">
+            and contract_info.housing_infoid =#{housing_infoid}
+        </if>
+        <if test="usersid != null and usersid != ''">
+            and contract_info.usersid =#{usersid}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and
+            (
+            users.username like CONCAT('%',#{keyword},'%') or
+            users.realname like CONCAT('%',#{keyword},'%') or
+
+
+            )
+        </if>
+        order by contract_infoid desc
+        <if test="(start != null and start != '') or start==0 ">
+            <if test=" limit != null and limit != ''">
+                limit #{start},#{limit}
+            </if>
+        </if>
+
+    </select>
+
+
+    <!-- 统计 获取 总数    用于分页-->
+
+    <select id="getRowSize" parameterType="map" resultType="int">
+        select count(1) from
+        contract_info
+        left join users on users .usersid=contract_info.usersid
+        left join housing_info on contract_info.housing_infoid = housing_info.housing_infoid
+
+        where 1=1
+
+
+        <if test="housing_infoid_list != null and housing_infoid_list.size > 0">
+            and contract_info.housing_infoid in
+            <foreach item="item" collection="housing_infoid_list" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+
+        </if>
+
+
+        <if test="housing_infoid != null and housing_infoid != ''">
+            and contract_info.housing_infoid =#{housing_infoid}
+        </if>
+        <if test="usersid != null and usersid != ''">
+            and contract_info.usersid =#{usersid}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and
+            (
+            users.username like CONCAT('%',#{keyword},'%') or
+            users.realname like CONCAT('%',#{keyword},'%') or
+
+
+            )
+        </if>
+        order by contract_infoid desc
+
+
+    </select>
+    <!-- 按主键查询 DAO通过id调用此配置 -->
+    <select id="getById" parameterType="String" resultMap="contract_infoMap">
+		select contract_info.* , users.username  as username, housing_info.housing_infoname  as housing_infoname,
+        users.realname from
+        contract_info
+         left join users on users .usersid=contract_info.usersid
+         left join housing_info on  contract_info.housing_infoid = housing_info.housing_infoid
+
+        where 1=1  and
+		contract_infoid=#{contract_infoid}
+	</select>
+    <!-- 按条件精确查询 DAO通过id调用此配置 -->
+    <select id="getByCond" parameterType="contract_info" resultMap="contract_infoMap">
+        select contract_info.* , users.username as username, housing_info.housing_infoname as housing_infoname,
+        users.realname from
+        contract_info
+        left join users on users .usersid=contract_info.usersid
+        left join housing_info on contract_info.housing_infoid = housing_info.housing_infoid
+
+        where 1=1
+        <if test="housing_infoid_list != null and housing_infoid_list.size > 0">
+            and contract_info.housing_infoid in
+            <foreach item="item" collection="housing_infoid_list" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+
+        </if>
+        <if test="usersid != null and '' != usersid">
+            and contract_info.usersid = #{usersid}
+        </if>
+        <if test="housing_infoid != null and '' != housing_infoid">
+            and contract_info.housing_infoid = #{housing_infoid}
+        </if>
+        <if test="addtime != null and '' != addtime">
+            and contract_info.addtime = #{addtime}
+        </if>
+        <if test="contract_info_files != null and '' != contract_info_files   or 0 == contract_info_files">
+            and contract_info.contract_info_files = #{contract_info_files}
+        </if>
+        <if test="memo != null and '' != memo">
+            and contract_info.memo = #{memo}
+        </if>
+    </select>
+    <!-- 按条件模糊查询 DAO通过id调用此配置 -->
+    <select id="getByLike" parameterType="contract_info" resultMap="contract_infoMap">
+        select contract_info.* , users.username as username, housing_info.housing_infoname as housing_infoname,
+        users.realname from
+        contract_info
+        left join users on users .usersid=contract_info.usersid
+        left join housing_info on contract_info.housing_infoid = housing_info.housing_infoid
+
+        where 1=1
+        <if test="housing_infoid_list != null and housing_infoid_list.size > 0">
+            and contract_info.housing_infoid in
+            <foreach item="item" collection="housing_infoid_list" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+
+
+        </if>
+        <if test="usersid != null and '' != usersid">
+            and contract_info.usersid like CONCAT('%', CONCAT(#{usersid}, '%'))
+        </if>
+        <if test="housing_infoid != null and '' != housing_infoid">
+            and contract_info.housing_infoid like CONCAT('%', CONCAT(#{housing_infoid}, '%'))
+        </if>
+        <if test="addtime != null and '' != addtime">
+            and contract_info.addtime like CONCAT('%', CONCAT(#{addtime}, '%'))
+        </if>
+        <if test="contract_info_files != null and '' != contract_info_files  or 0 == contract_info_files">
+            and contract_info.contract_info_files like CONCAT('%', CONCAT(#{contract_info_files}, '%'))
+        </if>
+        <if test="memo != null and '' != memo">
+            and contract_info.memo like CONCAT('%', CONCAT(#{memo}, '%'))
+        </if>
+    </select>
+</mapper>
+
+

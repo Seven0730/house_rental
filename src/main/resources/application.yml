@@ -1,0 +1,56 @@
+﻿server:
+    port: 8083
+    servlet:
+        context-path: /products
+
+
+spring:
+    # 数据源配置
+    datasource:
+        url: jdbc:mysql://127.0.0.1:3308/db_products?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+        username: root
+        password: root
+        driver-class-name: com.mysql.cj.jdbc.Driver
+    # JSON返回配置
+    jackson:
+        date-format: yyyy-MM-dd HH:mm:ss
+        serialization:
+            # 默认返回long时间戳，在配置文件中加入
+            write-dates-as-timestamps: true
+    mvc:
+        throw-exception-if-no-handler-found: true
+    servlet:
+        multipart:
+            max-file-size: 100MB
+            max-request-size: 100MB
+
+
+
+
+
+mybatis:
+    # mybatis 扫描SQL xml文件
+    mapper-locations: classpath:mappers/*.xml
+    # 实体扫描，多个package用逗号或者分号分隔
+    type-aliases-package: com.superCode.entity
+
+    configuration:
+        # 不要使用驼峰命名转换  不修改下划线属性
+        map-underscore-to-camel-case: false
+        cache-enabled: false
+        call-setters-on-nulls: true
+        # 控制台打印sql语句的方法
+        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+
+##日志级别控制：设置为debug，方便查看sql
+logging:
+    level:
+        com:
+            superCode: debug
+            org:
+                springframework: debug
+
+
+
+

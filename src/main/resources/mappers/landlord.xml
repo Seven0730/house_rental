@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 配置Mabatis映射文件 -->
+<mapper namespace="com.superCode.dao.LandlordDAO">
+    <resultMap type="com.superCode.entity.Landlord" id="landlordMap">
+        <id property="landlordid" column="landlordid"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="title" column="title"/>
+        <result property="slogan" column="slogan"/>
+        <result property="createdate" column="createdate"/>
+        <result property="contact" column="contact"/>
+        <result property="categoryid" column="categoryid"/>
+        <result property="contents" column="contents"/>
+        <result property="categoryname" column="categoryname"/>
+        <result property="image" column="image"/>
+    </resultMap>
+    <!-- 插入语句 DAO通过id调用此配置 -->
+    <insert id="insert" parameterType="landlord">
+		insert into
+		landlord(  username , password , title , slogan ,
+		createdate ,
+		contact , categoryid , contents,image )
+		values(
+		#{username} ,
+		#{password} , #{title} , #{slogan} , #{createdate} ,
+		#{contact} ,
+		#{categoryid} , #{contents} ,#{image})
+	</insert>
+    <!-- 更新语句 DAO通过id调用此配置 -->
+    <update id="update" parameterType="landlord">
+		update landlord set
+		username=#{username} , password=#{password} ,
+		title=#{title} ,
+		slogan=#{slogan} , createdate=#{createdate} ,
+		contact=#{contact} ,
+		categoryid=#{categoryid} , contents=#{contents} , image=#{image} where
+		landlordid=#{landlordid}
+	</update>
+    <!-- 按主键删除 DAO通过id调用此配置 -->
+    <delete id="delete" parameterType="String">
+		delete from landlord where
+		landlordid = #{landlordid}
+	</delete>
+    <!-- 查询全部信息 DAO通过id调用此配置 -->
+    <select id="getAll" parameterType="map"  resultMap="landlordMap">
+		select  landlord.* ,  category.categoryname from
+		landlord  , category
+		where landlord.categoryid = category.categoryid
+
+        <if test="keyword != null and keyword != ''">
+            and
+            (
+            landlord.username like CONCAT('%',#{keyword},'%') or
+            landlord.title like CONCAT('%',#{keyword},'%')
+
+            )
+        </if>
+
+        <if test="categoryid != null and categoryid != ''">
+            and
+            (
+            landlord.categoryid =#{categoryid}
+
+            )
+        </if>
+
+		order by landlordid desc
+        <if test="(start != null and start != '') or start==0 ">
+            <if test=" limit != null and limit != ''">
+                limit #{start},#{limit}
+            </if>
+        </if>
+
+    </select>
+
+
+    <!-- 统计 获取 总数    用于分页-->
+
+    <select id="getRowSize" parameterType="map"  resultType="int" >
+		select   count(1) from
+		landlord  , category
+		where landlord.categoryid = category.categoryid
+
+        <if test="keyword != null and keyword != ''">
+            and
+            (
+            landlord.username like CONCAT('%',#{keyword},'%') or
+            landlord.title like CONCAT('%',#{keyword},'%')
+
+            )
+        </if>
+
+        <if test="categoryid != null and categoryid != ''">
+            and
+            (
+            landlord.categoryid =#{categoryid}
+
+            )
+        </if>
+
+
+    </select>
+    <!-- 按主键查询 DAO通过id调用此配置 -->
+    <select id="getById" parameterType="String" resultMap="landlordMap">
+		select a.* , b.categoryname from landlord a , category b where a.categoryid =
+		b.categoryid and landlordid=#{landlordid}
+	</select>
+    <!-- 按条件精确查询 DAO通过id调用此配置 -->
+    <select id="getByCond" parameterType="landlord" resultMap="landlordMap">
+        select a.* , b.categoryname from landlord a , category b where a.categoryid =
+        b.categoryid
+        <if test="username != null and '' != username">
+            and a.username = #{username}
+        </if>
+        <if test="password != null and '' != password">
+            and a.password = #{password}
+        </if>
+        <if test="title != null and '' != title">
+            and a.title = #{title}
+        </if>
+        <if test="slogan != null and '' != slogan">
+            and a.slogan = #{slogan}
+        </if>
+        <if test="createdate != null and '' != createdate">
+            and a.createdate = #{createdate}
+        </if>
+        <if test="contact != null and '' != contact">
+            and a.contact = #{contact}
+        </if>
+        <if test="categoryid != null and '' != categoryid">
+            and a.categoryid = #{categoryid}
+        </if>
+        <if test="contents != null and '' != contents">
+            and a.contents = #{contents}
+        </if>
+    </select>
+    <!-- 按条件模糊查询 DAO通过id调用此配置 -->
+    <select id="getByLike" parameterType="landlord" resultMap="landlordMap">
+        select a.* , b.categoryname from landlord a , category b where a.categoryid =
+        b.categoryid
+        <if test="username != null and '' != username">
+            and a.username like CONCAT('%', CONCAT(#{username}, '%'))
+        </if>
+        <if test="password != null and '' != password">
+            and a.password like CONCAT('%', CONCAT(#{password}, '%'))
+        </if>
+        <if test="title != null and '' != title">
+            and a.title like CONCAT('%', CONCAT(#{title}, '%'))
+        </if>
+        <if test="slogan != null and '' != slogan">
+            and a.slogan like CONCAT('%', CONCAT(#{slogan}, '%'))
+        </if>
+        <if test="createdate != null and '' != createdate">
+            and a.createdate like CONCAT('%', CONCAT(#{createdate}, '%'))
+        </if>
+        <if test="contact != null and '' != contact">
+            and a.contact like CONCAT('%', CONCAT(#{contact}, '%'))
+        </if>
+        <if test="categoryid != null and '' != categoryid">
+            and a.categoryid like CONCAT('%', CONCAT(#{categoryid}, '%'))
+        </if>
+        <if test="contents != null and '' != contents">
+            and a.contents like CONCAT('%', CONCAT(#{contents}, '%'))
+        </if>
+    </select>
+</mapper>
+
+

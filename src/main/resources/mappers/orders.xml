@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 配置Mabatis映射文件 -->
+<mapper namespace="com.superCode.dao.OrdersDAO">
+    <resultMap type="com.superCode.entity.Orders" id="ordersMap">
+        <id property="ordersid" column="ordersid"/>
+        <result property="usersid" column="usersid"/>
+        <result property="housing_infoid" column="housing_infoid"/>
+        <result property="addtime" column="addtime"/>
+        <result property="ordertime" column="ordertime"/>
+        <result property="status" column="status"/>
+        <result property="memo" column="memo"/>
+        <result property="username" column="username"/>
+        <result property="realname" column="realname"/>
+    </resultMap>
+    <!-- 插入语句 DAO通过id调用此配置 -->
+    <insert id="insert" parameterType="orders">
+        insert into orders(usersid, housing_infoid, addtime, status, memo, ordertime)
+        values ( #{usersid}, #{housing_infoid}, #{addtime}, #{status}
+               , #{memo}, #{ordertime})
+    </insert>
+    <!-- 更新语句 DAO通过id调用此配置 -->
+    <update id="update" parameterType="orders">
+        update orders
+        set usersid=#{usersid},
+            housing_infoid=#{housing_infoid},
+            addtime=#{addtime},
+            status=#{status},
+            memo=#{memo},
+            ordertime=#{ordertime}
+        where ordersid = #{ordersid}
+    </update>
+    <!-- 按主键删除 DAO通过id调用此配置 -->
+    <delete id="delete" parameterType="String">
+        delete
+        from orders
+        where ordersid = #{ordersid}
+    </delete>
+    <!-- 查询全部信息 DAO通过id调用此配置 -->
+    <select id="getAll" parameterType="map" resultMap="ordersMap">
+        select orders.* , users.username as username, housing_info.housing_infoname as housing_infoname,
+        users.realname from
+        orders
+        left join users on users .usersid=orders.usersid
+        left join housing_info on orders.housing_infoid = housing_info.housing_infoid
+
+        where 1=1
+
+
+        <if test="housing_infoid_list != null and housing_infoid_list.size > 0">
+            and orders.housing_infoid in
+            <foreach item="item" collection="housing_infoid_list" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+
+        </if>
+
+
+        <if test="housing_infoid != null and housing_infoid != ''">
+            and orders.housing_infoid =#{housing_infoid}
+        </if>
+        <if test="usersid != null and usersid != ''">
+            and orders.usersid =#{usersid}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and
+            (
+            users.username like CONCAT('%',#{keyword},'%') or
+            users.realname like CONCAT('%',#{keyword},'%')
+
+
+            )
+        </if>
+        order by ordersid desc
+        <if test="(start != null and start != '') or start==0 ">
+            <if test=" limit != null and limit != ''">
+                limit #{start},#{limit}
+            </if>
+        </if>
+
+    </select>
+
+
+    <!--获取房源预约看房审核成功的可预约看房人数-->
+
+    <select id="getOrdersNumber" parameterType="int" resultType="int">
+        select count(1)
+        from orders
+        where orders.housing_infoid = #{housing_infoid}
+
+          and status = '审核通过'
+
+
+    </select>
+
+
+    <!-- 统计 获取 总数    用于分页-->
+
+    <select id="getRowSize" parameterType="map" resultType="int">
+        select count(1) from
+        orders
+        left join users on users .usersid=orders.usersid
+        left join housing_info on orders.housing_infoid = housing_info.housing_infoid
+
+        where 1=1
+
+
+        <if test="housing_infoid_list != null and housing_infoid_list.size > 0">
+            and orders.housing_infoid in
+            <foreach item="item" collection="housing_infoid_list" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+
+        </if>
+
+
+        <if test="housing_infoid != null and housing_infoid != ''">
+            and orders.housing_infoid =#{housing_infoid}
+        </if>
+        <if test="usersid != null and usersid != ''">
+            and orders.usersid =#{usersid}
+        </if>
+        <if test="keyword != null and keyword != ''">
+            and
+            (
+            users.username like CONCAT('%',#{keyword},'%') or
+            users.realname like CONCAT('%',#{keyword},'%')
+
+
+            )
+        </if>
+        <if test="status != null and status != ''">
+
+
+            and orders.status =#{status}
+
+
+        </if>
+        order by ordersid desc
+
+
+    </select>
+    <!-- 按主键查询 DAO通过id调用此配置 -->
+    <select id="getById" parameterType="String" resultMap="ordersMap">
+        select orders.*,
+               users.username                as username,
+               housing_info.housing_infoname as housing_infoname,
+               users.realname
+        from orders
+                 left join users on users.usersid = orders.usersid
+                 left join housing_info on orders.housing_infoid = housing_info.housing_infoid
+
+        where 1 = 1
+          and ordersid = #{ordersid}
+    </select>
+    <!-- 按条件精确查询 DAO通过id调用此配置 -->
+    <select id="getByCond" parameterType="orders" resultMap="ordersMap">
+        select orders.* , users.username as username, housing_info.housing_infoname as housing_infoname,
+        users.realname from
+        orders
+        left join users on users .usersid=orders.usersid
+        left join housing_info on orders.housing_infoid = housing_info.housing_infoid
+
+        where 1=1
+        <if test="housing_infoid_list != null and housing_infoid_list.size > 0">
+            and orders.housing_infoid in
+            <foreach item="item" collection="housing_infoid_list" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+
+        </if>
+        <if test="usersid != null and '' != usersid">
+            and orders.usersid = #{usersid}
+        </if>
+        <if test="housing_infoid != null and '' != housing_infoid">
+            and orders.housing_infoid = #{housing_infoid}
+        </if>
+        <if test="addtime != null and '' != addtime">
+            and orders.addtime = #{addtime}
+        </if>
+        <if test="status != null and '' != status   or 0 == status">
+            and orders.status = #{status}
+        </if>
+        <if test="memo != null and '' != memo">
+            and orders.memo = #{memo}
+        </if>
+    </select>
+    <!-- 按条件模糊查询 DAO通过id调用此配置 -->
+    <select id="getByLike" parameterType="orders" resultMap="ordersMap">
+        select orders.* , users.username as username, housing_info.housing_infoname as housing_infoname,
+        users.realname from
+        orders
+        left join users on users .usersid=orders.usersid
+        left join housing_info on orders.housing_infoid = housing_info.housing_infoid
+
+        where 1=1
+        <if test="housing_infoid_list != null and housing_infoid_list.size > 0">
+            and orders.housing_infoid in
+            <foreach item="item" collection="housing_infoid_list" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+
+
+        </if>
+        <if test="usersid != null and '' != usersid">
+            and orders.usersid like CONCAT('%', CONCAT(#{usersid}, '%'))
+        </if>
+        <if test="housing_infoid != null and '' != housing_infoid">
+            and orders.housing_infoid like CONCAT('%', CONCAT(#{housing_infoid}, '%'))
+        </if>
+        <if test="addtime != null and '' != addtime">
+            and orders.addtime like CONCAT('%', CONCAT(#{addtime}, '%'))
+        </if>
+        <if test="status != null and '' != status  or 0 == status">
+            and orders.status like CONCAT('%', CONCAT(#{status}, '%'))
+        </if>
+        <if test="memo != null and '' != memo">
+            and orders.memo like CONCAT('%', CONCAT(#{memo}, '%'))
+        </if>
+    </select>
+
+    <!--预约看房人数分析-->
+    <select id="orderMoneyTotal" resultType="hashmap" parameterType="map">
+
+
+        SELECT
+        DATE_FORMAT(addtime, '%Y-%m-%d') AS addtime,
+        ifnull(count(*),0) as total
+        FROM
+        orders
+        WHERE
+        1=1
+        AND addtime != ''
+
+        <if test="createdate1 != null and createdate1 != '' and createdate2 != null and createdate2 != ''">
+
+            and    <![CDATA[ addtime >=#{createdate1} and  addtime<=#{createdate2}   ]]>
+
+        </if>
+        GROUP BY
+        DATE_FORMAT(addtime, '%Y-%m-%d') ASC
+
+
+    </select>
+
+
+    <!--区域房源分析-->
+    <select id="getcontract_infonumber" resultType="hashmap" parameterType="map">
+
+
+        select
+
+        category.categoryname as name,count(*)as value
+        from housing_info
+        left join landlord on landlord.landlordid=housing_info.landlordid
+        left join category on landlord.categoryid=category.categoryid
+        GROUP BY landlord.categoryid
+
+
+
+
+    </select>
+
+
+</mapper>
+
+
